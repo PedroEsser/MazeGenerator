@@ -14,8 +14,7 @@ public class MazeBuilder extends Thread {
 	protected int current;
 
 	public MazeBuilder(int w, int h) {
-		grid = new Grid(w % 2 == 0 ? w + 1 : w, h % 2 == 0 ? h + 1 : h);// width and height have to be odd for
-																		// mazebuilder to work
+		grid = new Grid(w , h);
 		path = new Stack<>();
 		startRandomPosition();
 	}
@@ -27,9 +26,10 @@ public class MazeBuilder extends Thread {
 		System.out.println((System.nanoTime() - timeStamp) / 1000000d + " ms to build Maze");
 	}
 
-	private void buildMaze() {
+	protected void buildMaze() {
 		System.out.println("Building Maze...");
-		while (step());
+		while (step())
+			;
 	}
 
 	protected boolean step() {
@@ -62,7 +62,7 @@ public class MazeBuilder extends Thread {
 
 	protected int randomPossibleDirection() {
 		ArrayList<Integer> possibleDirections = new ArrayList<>(4);
-		for (int d : grid.directions())
+		for (int d : grid.getDirections())
 			try {
 				int aux = current + 2 * d;
 				if (grid.isWall(aux) && !grid.isBorder(aux))

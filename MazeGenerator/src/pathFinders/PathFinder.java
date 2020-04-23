@@ -6,7 +6,7 @@ import utils.MazeUtils;
 
 public abstract class PathFinder extends Thread {
 
-	private static final String SUBPATH = "images/";
+	private static final String SUBPATH = "C:\\Users\\pedro\\Desktop\\MazeShizzle\\images/";
 	protected Path path;
 	protected final Maze maze;
 	protected final String dirPath, imgName;

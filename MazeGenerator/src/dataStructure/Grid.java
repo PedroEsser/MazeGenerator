@@ -10,14 +10,12 @@ public class Grid {
 	private final BitArray bitArray;
 	private final int width;
 	private final int height;
-	private static final int BITSPERINT = 32;
-	private final int[] directions;
+	private int[] directions;
 
 	public Grid(int width, int height) {
 		this.width = width;
 		this.height = height;
 		int nBits = width * height;
-		directions = getDirections();
 		bitArray = new BitArray(nBits);
 	}
 
@@ -67,7 +65,7 @@ public class Grid {
 
 	public List<Integer> getCellsAround(int position) {
 		LinkedList<Integer> cells = new LinkedList<>();
-		for (int dir : directions())
+		for (int dir : getDirections())
 			if (validPosition(dir + position))
 				cells.add(dir + position);
 		return cells;
@@ -75,7 +73,7 @@ public class Grid {
 
 	public List<Integer> getPathsAround(int position) {
 		LinkedList<Integer> cells = new LinkedList<>();
-		for (int dir : directions()) {
+		for (int dir : getDirections()) {
 			int aux = dir + position;
 			if (validPosition(aux) && !isWall(aux))
 				cells.add(aux);
@@ -88,21 +86,19 @@ public class Grid {
 		return p.x == 0 || p.x == width - 1 || p.y == 0 || p.y == height - 1 || pos >= width*height;
 	}
 
-	private int[] getDirections() {
-		int[] directions = new int[4];
-		directions[0] = -width;
-		directions[1] = 1;
-		directions[2] = width;
-		directions[3] = -1;
+	public int[] getDirections() {
+		if(directions == null) {
+			directions = new int[4];
+			directions[0] = -width;
+			directions[1] = 1;
+			directions[2] = width;
+			directions[3] = -1;
+		}
 		return directions;
 	}
 
 	public boolean validPosition(int position) {
 		return bitArray.validPosition(position);
-	}
-
-	public int[] directions() {
-		return directions;
 	}
 
 }

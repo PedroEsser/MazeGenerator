@@ -8,74 +8,48 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import colorSchemes.ColorScheme;
+import colorSchemes.Parameter;
 import colorSchemes.RainbowCS;
+import gui.MazeVisualizer;
 import gui.Menu;
 
-public class ColorSchemeChooser extends JFrame{
+public class ColorSchemeChooser extends JPanel{
 
-	private static final int DEFAULTWIDTH = 600;
-	private static final int DEFAULTHEIGHT = 200;
-	private MyValueChooser[] values = new MyValueChooser[3];
-	private ColorSchemeVisualizer csv;
+	private final MyValueChooser[] values;
+	private final ColorSchemeVisualizer csv;
 	
-	public ColorSchemeChooser(Menu menu) {
-		super("Color scheme Visualizer");
-		RainbowCS cs = (RainbowCS)menu.getColorScheme();
+	public ColorSchemeChooser(ColorScheme cs) {
+		super();
 		this.csv = new ColorSchemeVisualizer(cs);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setSize(DEFAULTWIDTH, DEFAULTHEIGHT);
-		setLocationRelativeTo(null);
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(5,1));
+		Parameter[] pars = cs.getParameters();
+		setLayout(new GridLayout(pars.length + 1,1));
 		
-		values[0] = new MyValueChooser("Offset", cs.getOffset(), 0, 1);
-		values[1] = new MyValueChooser("Shift", cs.getShift(), 0, 5);
-		values[2] = new MyValueChooser("Amplitude", cs.getAmplitude(), -5, 5);
-		for(MyValueChooser v : values)
-			panel.add(v);
+		values = new MyValueChooser[pars.length];
+		for(int i = 0 ; i < pars.length ; i++) {
+			values[i] = new MyValueChooser(pars[i]);
+			add(values[i]);
+		}
 		
-		panel.add(csv);
-		JButton applyButton = new JButton("Apply!");
-		applyButton.addActionListener((e) -> {
-			menu.setColorScheme(getColorScheme());
-			this.dispose();
-		});
-		JButton restoreButton = new JButton("Restore Values");
-		restoreButton.addActionListener((e) -> {
-			for(MyValueChooser v : values)
-				v.restoreInitialValues();
-		});
-		JPanel lastPanel = new JPanel();
-		lastPanel.setLayout(new GridLayout(1, 2));
-		lastPanel.add(restoreButton);
-		lastPanel.add(applyButton);
-		
-		panel.add(lastPanel);
-		add(panel);
-		setVisible(true);
-		SwingUtilities.invokeLater(() -> {
-			updateCS();
-		});
-	}
-	
-	private ColorScheme getColorScheme() {
-		return new RainbowCS(values[0].getValue(), values[1].getValue(), values[2].getValue());
+		add(csv);
 	}
 	
 	private void updateCS() {
-		csv.setCS(getColorScheme());
 		csv.updateUI();
 	}
 	
 	private class MyValueChooser extends SliderValueChooser{
 		
-		public MyValueChooser(String name, float initialValue, float min, float max) {
-			super(name, initialValue, min, max);
+		private final Parameter par;
+		
+		public MyValueChooser(Parameter p) {
+			super(p.getName(), p.getValue(), p.getMinRecommended(), p.getMaxRecommended());
+			par = p;
 		}
-
+		
 		@Override
-		protected void changeValue() {
-			super.changeValue();
+		public void setValue(double val) {
+			super.setValue(val);
+			par.setValue(val);
 			updateCS();
 		}
 		
@@ -83,6 +57,7 @@ public class ColorSchemeChooser extends JFrame{
 		protected void validateText() {
 			super.validateText();
 			try {
+				par.setValue(getTextValue());
 				updateCS();
 			}catch(NumberFormatException e) {}
 		}

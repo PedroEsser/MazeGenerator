@@ -24,6 +24,10 @@ public class ValueChooser extends JPanel{
 		add(valueField);
 	}
 	
+	public void setValue(int value) {
+		valueField.setText(value + "");
+	}
+	
 	public int getValue() {
 		return Integer.parseInt(valueField.getText());
 	}

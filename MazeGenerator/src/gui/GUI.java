@@ -5,51 +5,46 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import costumIterators.IndexedIterator;
 import pathFinders.FloodFillPlus;
 
-public class GUI extends Thread {
+public class GUI extends JPanel {
 
-	private final JFrame frame = new JFrame();
-	private final JPanel panel;
 	private final BufferedImage img;
 	private final long pseudoTime;
-	private static final long TIMECONSTANT = 2000000000000l;
+	private static final long TIMECONSTANT = 1000000000000l;
+	private IndexedIterator it;
 
-	public GUI(BufferedImage img) {
-		this.img = img;
+	public GUI(IndexedIterator it) {
+		this.it = it;
+		this.img = it.get(0);
 		this.pseudoTime = TIMECONSTANT / (img.getHeight()*img.getWidth());
-		frame.setUndecorated(true);
-		frame.setSize(img.getWidth(), img.getHeight());// * 4 / 5
-		frame.setLocationRelativeTo(null);
-		panel = new JPanel() {
-			@Override
-			protected void paintComponent(Graphics g) {
-				final Graphics2D g2d = (Graphics2D) g;
-				final AffineTransform t = g2d.getTransform();
-				t.setToScale(1, 1);
-				g2d.setTransform(t);
-				g2d.drawImage(img, 0, 0, this);
-				// g.drawImage(image, 0, 0, this);
-			}
-		};
-		frame.add(panel);
+//		frame.setUndecorated(true);
+//		frame.setSize(img.getWidth() * 4 / 5, img.getHeight() * 4 / 5);// * 4 / 5
+//		frame.setLocationRelativeTo(null);
 	}
-
-	public void toggle() {
-		frame.setVisible(!frame.isVisible());
-	}
-
-	public void close() {
-		frame.dispose();
-	}
-
+	
 	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		final Graphics2D g2d = (Graphics2D) g;
+		final AffineTransform t = g2d.getTransform();
+		t.setToScale(1, 1);
+		g2d.setTransform(t);
+		g2d.drawImage(img, 0, 0, this);
+	}
+
 	public void run() {
+		for(BufferedImage img : it) {
+			updateUI();
+			costumSleep();
+		}
 		/*while (plus.next()) {
 			panel.updateUI();
 			//defaultSleep();

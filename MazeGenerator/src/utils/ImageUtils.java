@@ -3,6 +3,7 @@ package utils;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
@@ -61,11 +62,28 @@ public class ImageUtils {
 				croppedImage.setRGB(i - r.x, j - r.y, img.getRGB(i, j));
 		return croppedImage;
 	}
+	
+	private static FileFilter getFileFilter(String name) {
+		FileFilter ff = new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				String s = pathname.getName();
+				if(s.startsWith(name) && s.endsWith(".png")) 
+					try {
+						Integer.parseInt(s.substring(name.length(), s.length() - 4));
+						return true;
+					}catch(NumberFormatException e) {
+						return false;
+					}
+				return false;
+			}
+		};
+		return ff;
+	}
 
 	public static String getNextImageName(String directory, String name) {
 		int index = 0;
-		File[] validImages = new File(directory)
-				.listFiles(s -> s.getName().startsWith(name) && s.getName().endsWith(".png"));
+		File[] validImages = new File(directory).listFiles(getFileFilter(name));
 		for (File f : validImages) {
 			String fileName = f.getName();
 			int id = Integer.parseInt(fileName.substring(name.length(), fileName.length() - 4));

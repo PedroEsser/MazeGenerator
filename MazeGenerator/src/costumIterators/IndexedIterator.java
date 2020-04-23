@@ -3,10 +3,12 @@ import java.awt.image.BufferedImage;
 import java.util.Iterator;
 
 public abstract class IndexedIterator implements Iterable<BufferedImage>{
-
-	protected abstract boolean validIndex(int index);
+	
+	public abstract boolean validIndex(int index);
 	
 	public abstract BufferedImage get(int index) ;
+	
+	public abstract int size();
 	
 	@Override
 	public Iterator<BufferedImage> iterator() {

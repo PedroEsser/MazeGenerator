@@ -9,19 +9,18 @@ import java.util.List;
 import Maze.Maze;
 import colorSchemes.ColorScheme;
 import colorSchemes.RainbowCS;
+import costumIterators.StepInterface;
 import utils.ImageUtils;
 import utils.MazeUtils;
 
-public class FloodFillPlus extends FloodFill{
+public class FloodFillPlus extends FloodFill implements StepInterface{
 
 	private static int WHITE = -1;
 	private final static ColorScheme DEFAULTCS = new RainbowCS();
-	private int scale;
+	private int scale = 1;
 	private BufferedImage img;
 	private ArrayList<List<Integer>> stages = new ArrayList<>();
-	private int stage = 0;
 	private ColorScheme cs = DEFAULTCS;
-	private float offset;
 	
 	public FloodFillPlus(Maze m) {
 		super(m);
@@ -37,7 +36,7 @@ public class FloodFillPlus extends FloodFill{
 		return super.step();
 	}
 
-	public void setImageScale(int scale) {
+	public void initImage(int scale) {
 		this.scale = scale;
 		img = MazeUtils.convertToImage(maze.getGrid());
 		img = ImageUtils.getScaledImage(img, scale);
@@ -48,21 +47,6 @@ public class FloodFillPlus extends FloodFill{
 		for (Node n : currentPaths)
 			current.add(n.data);
 		stages.add(current);
-	}
-	
-	public boolean validStage(int stage) {
-		return stage < stages.size() || stage >= 0;
-	}
-	
-	public void eraseStage(int stage) {
-		for (int i : stages.get(stage))
-			fillPosition(i, WHITE);
-	}
-	
-	public void fillStage(int stage) {
-		int rgb = cs.getColorRGB((float)stage / stages.size() + offset);
-		for (int i : stages.get(stage))
-			fillPosition(i, rgb);
 	}
 
 	private void fillPosition(int position, int rgb) {
@@ -87,34 +71,39 @@ public class FloodFillPlus extends FloodFill{
 
 	public void buildImage() {
 		for (int i = 0; i < stages.size(); i++)
-			fillStage(i);
-	}
-	
-	public void offset() {
-		offset += .002f;
-		buildImage();
+			fillStep(i);
 	}
 
 	public void saveImg() {
-		ImageUtils.saveImage(img, ImageUtils.getNextImageName(dirPath, imgName + "FloodFill"));
+		ImageUtils.saveImage(img, ImageUtils.getNextImageName("C:\\Users\\pedro\\Desktop\\BackgroundMaze", "FloodFill"));//dirPath
 	}
 
+	@Override
 	public void setColorScheme(ColorScheme cs) {
 		this.cs = cs;
 	}
 	
+	@Override
 	public BufferedImage getImage() {
 		return img;
 	}
 
-//	@Override
-//	public boolean next() {
-//		return validStage(stage++);
-//	}
-//	
-//	@Override
-//	public int getPixels() {
-//		return maze.getGrid().getBitArray().size();
-//	}
+	@Override
+	public void fillStep(int index) {
+		int rgb = cs.getColorRGB((double)index / stages.size());
+		for(int i : stages.get(index))
+			fillPosition(i, rgb);
+	}
+
+	@Override
+	public void clearStep(int index) {
+		for (int i : stages.get(index))
+			fillPosition(i, WHITE);
+	}
+
+	@Override
+	public int lastStep() {
+		return stages.size();
+	}
 
 }

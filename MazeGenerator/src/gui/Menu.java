@@ -9,16 +9,15 @@ import javax.swing.JPanel;
 import colorSchemes.ColorScheme;
 import colorSchemes.RainbowCS;
 import guiUtils.ColorSchemeChooser;
-import guiUtils.MazeVisualizer;
 import guiUtils.ValueChooser;
+import main.MazeGenerator;
 
 public class Menu extends JFrame{
 
 	private final static int DEFAULTWIDTH = 600;
 	private final static int DEFAULTHEIGHT = 400;
 	private final JPanel panel;
-	private ColorScheme cs = new RainbowCS();
-	private final OddValueChooser[] dimensions = new OddValueChooser[2];
+	private final ValueChooser[] dimensions = new ValueChooser[3];
 	
 	public Menu() {
 		super("MazeGenerator");
@@ -26,35 +25,26 @@ public class Menu extends JFrame{
 		setSize(DEFAULTWIDTH, DEFAULTHEIGHT);
 		setLocationRelativeTo(null);
 		panel = new JPanel();
-		panel.setLayout(new GridLayout(4,1));
-		dimensions[0] = new OddValueChooser("Width (has to be odd)", 601);
-		dimensions[1] = new OddValueChooser("Height (has to be odd)", 601);
+		panel.setLayout(new GridLayout(5,1));
+		dimensions[0] = new OddValueChooser("Width (should be odd)", 101);
+		dimensions[1] = new OddValueChooser("Height (should be odd)", 81);
+		dimensions[2] = new ValueChooser("Scale", 5);
 		panel.add(dimensions[0]);
 		panel.add(dimensions[1]);
+		panel.add(dimensions[2]);
 		JButton generateButton = new JButton("Generate Maze!");
 		generateButton.addActionListener((e) -> {
-			mv.generateMaze(dimensions[0].getValue(), dimensions[1].getValue());
+			MazeGenerator mg = new MazeGenerator(dimensions[0].getValue(), dimensions[1].getValue(), dimensions[2].getValue());
+			new MazeVisualizer(mg);
 		});
 		panel.add(generateButton);
-		JButton csc = new JButton("Change color scheme");
-		csc.addActionListener((e) ->{
-			new ColorSchemeChooser(this);
+		JButton importButton = new JButton("Import Maze");
+		importButton.addActionListener((e) -> {
+			new ImportWindow();
 		});
-		panel.add(csc);
+		panel.add(importButton);
 		add(panel);
 		setVisible(true);
-	}
-	
-	public Dimension getDimension() {
-		
-	}
-	
-	public void setColorScheme(ColorScheme cs) {
-		this.cs = cs;
-	}
-	
-	public ColorScheme getColorScheme() {
-		return cs;
 	}
 	
 	private class OddValueChooser extends ValueChooser{
